@@ -1,6 +1,7 @@
 import { Application } from 'pixi.js'
 import { Board } from './board.js'
 
+
 export class Game extends Application {
     constructor() {
         super({
@@ -30,7 +31,7 @@ export class Game extends Application {
     _onLoadComplete() {
         this._board = new Board({
             entry: 5,
-            spawn: 64,
+            spawn: 5,
             size: 8
         })
         this._board.position.set(100, 100)
