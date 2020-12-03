@@ -7,8 +7,5 @@ export class Ball extends Sprite {
         super(Texture.from(frame));
         this.frame = frame
         this.anchor.set(0.5)
-
-
     }
-
 }

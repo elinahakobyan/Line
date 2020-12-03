@@ -31,7 +31,7 @@ export class Game extends Application {
     _onLoadComplete() {
         this._board = new Board({
             entry: 5,
-            spawn: 5,
+            spawn: 3,
             size: 8
         })
         this._board.position.set(100, 100)

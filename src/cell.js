@@ -1,30 +1,24 @@
 import { Sprite, Texture } from 'pixi.js'
 import { Ball } from '../src/ball'
 
-var clickCount = 0
 export class Cell extends Sprite {
 
     constructor() {
         super(Texture.from('button'));
-
         this.anchor.set(0.5)
     }
 
-    crateBall(ballFrame) {
-        this.ball = new Ball(ballFrame)
-
-        this.addChild((this.ball))
+    isEmpty() {
+        return !this.ball
     }
 
-    checkBall() {
-        if (this.ball) {
-            this.activate()
-            return this
-        }
+    setBall(ball) {
+        this.addChild((this.ball = ball))
     }
 
     activate() {
         this.ball.alpha = 0.5
+
         return this
     }
 
@@ -33,15 +27,11 @@ export class Cell extends Sprite {
 
         return this
     }
+    remove() {
+        if (this.ball) {
+            this.ball.destroy();
+            this.ball = null;
+        }
 
-    delete() {
-        this.ball.destroy()
-        this.ball = null
     }
-
-
-
-
-
-
 }

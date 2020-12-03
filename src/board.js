@@ -4,6 +4,8 @@ import sample from 'lodash.sample'
 import { BAllS } from './constants';
 import { Cell } from './cell.js'
 import { Ball } from './ball';
+import chunk from 'lodash.chunk'
+
 
 export class Board extends Container {
 
@@ -15,8 +17,7 @@ export class Board extends Container {
         this.balls = []
 
         this._createCells()
-        this.createBalls(this.config.spawn)
-        this.checkWin()
+        this._createBalls(this.config.entry)
     }
 
     _createCells() {
@@ -25,55 +26,84 @@ export class Board extends Container {
             for (let col = 0; col < size; col++) {
                 const cell = new Cell()
                 cell.interactive = true
-                cell.on('pointerdown', () => {
-                    this._onCellPointerDown(cell)
-                })
+                cell.on('pointerdown', this._onCellClick.bind(this, cell))
                 cell.x = col * cell.width
                 cell.y = row * cell.height
+
                 this.cells.push(cell)
                 this.addChild(cell)
             }
         }
+
+        this.cells2D = chunk(this.cells, size)
     }
 
-    createBalls(count) {
-        const emptyCells = this.cells.filter((cell) => !cell.ball)
-        for (let i = 0; i < count; i++) {
-            const ballIndex = Math.floor(BAllS.length * Math.random())
-            const frame = BAllS[ballIndex]
-            const cellIndex = Math.floor(emptyCells.length * Math.random())
-            const cell = emptyCells.splice(cellIndex, 1)[0]
-            cell.crateBall(frame)
+    _createBalls(count) {
+        const emptyCells = sampleSize(this.cells.filter((cell) => !cell.ball), count)
+        emptyCells.forEach(cell => {
+            const frame = sample(BAllS)
+            const ball = new Ball(frame)
+            cell.setBall(ball)
+            // console.warn(frame);
+        })
+
+        this._checkForMatch()
+        this._checkForGameOver()
+            ;
+
+    }
+
+    _onCellClick(cell) {
+        if (this._activeCell) {
+            this._activeCell.deactivate()
         }
-    }
 
-    _onCellPointerDown(cell) {
         if (cell.ball) {
-            this.activeCell && this.activeCell.deactivate()
-            this.activeCell = cell.checkBall();
+            this._activeCell = cell.activate()
+        } else if (cell.isEmpty() && this._activeCell) {
+            cell.setBall(this._activeCell.ball)
+            this._activeCell.ball = null
+            this._activeCell = null
 
-            return;
+            this._createBalls(this.config.spawn)
         }
-
-        if (this.activeCell) {
-            const frame = this.activeCell.ball.frame
-            this.activeCell.delete()
-            cell.crateBall(frame)
-            this.createBalls(3)
-
-            this.activeCell = null
-        }
-        this.checkWin()
-    }
-    checkWin() {
-        for (let i = 0; i < this.cells.length; i++) {
-            // if (this.cells[i].ball) {
-
-            // }
-        }
-
-
     }
 
+    _checkForMatch(cell) {
+        const { size } = this.config
+        let count = 0;
+        let arr = []
+        for (let i = 0; i < size; i++) {
+            for (let j = 0; j < size; j++) {
+                const a = this.cells2D[i][j]
+                const b = this.cells2D[i][j + 1]
+                console.warn(a.ball);
+                // console.warn(a);
+                if (a & b) {
+                    if ((a['ball']) && (b['ball'])) {
+                        if (a['ball']['frame'] === b['ball']['frame']) {
+                            count++
+                            // arr.push(this.cells2D[i][j]['ball']['frame'])
+                            if (count > 4) {
+                                console.warn('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+                                // arr.forEach(cell =>
+                                //     cell.remove())
+                            }
+                        }
+                    } else {
+                        count = 0;
+                        // arr = []
+                    }
+                }
+            }
 
+        }
+
+    }
+
+    _checkForGameOver() {
+        // if (!this.) {
+        //     console.warn('GAME OVER');
+        // }
+    }
 }
