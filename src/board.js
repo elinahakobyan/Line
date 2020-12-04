@@ -29,13 +29,13 @@ export class Board extends Container {
                 cell.on('pointerdown', this._onCellClick.bind(this, cell))
                 cell.x = col * cell.width
                 cell.y = row * cell.height
-
                 this.cells.push(cell)
                 this.addChild(cell)
             }
         }
 
         this.cells2D = chunk(this.cells, size)
+        // console.warn(this.cells2D);
     }
 
     _createBalls(count) {
@@ -44,11 +44,13 @@ export class Board extends Container {
             const frame = sample(BAllS)
             const ball = new Ball(frame)
             cell.setBall(ball)
-            // console.warn(frame);
         })
 
         this._checkForMatch()
         this._checkForGameOver()
+        this._movment()
+
+
             ;
 
     }
@@ -67,43 +69,100 @@ export class Board extends Container {
 
             this._createBalls(this.config.spawn)
         }
+        // console.warn(cell.x)
+        // console.warn(this._activeCell.x);
     }
 
     _checkForMatch(cell) {
         const { size } = this.config
-        let count = 0;
         let arr = []
+        let ballFrame = ''
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
-                const a = this.cells2D[i][j]
-                const b = this.cells2D[i][j + 1]
-                console.warn(a.ball);
-                // console.warn(a);
-                if (a & b) {
-                    if ((a['ball']) && (b['ball'])) {
-                        if (a['ball']['frame'] === b['ball']['frame']) {
-                            count++
-                            // arr.push(this.cells2D[i][j]['ball']['frame'])
-                            if (count > 4) {
-                                console.warn('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-                                // arr.forEach(cell =>
-                                //     cell.remove())
-                            }
-                        }
+                const cell = this.cells2D[i][j]
+                if (cell && cell.ball && cell.ball.frame === ballFrame) {
+                    arr.push(cell)
+                } else {
+                    if (arr.length <= 4) {
+                        arr = []
                     } else {
-                        count = 0;
-                        // arr = []
+                        arr.forEach(element => {
+                            element.remove()
+                        })
+                        arr = []
+                    }
+                    if (cell && cell.ball && cell.ball.frame) {
+                        ballFrame = cell.ball.frame
+                        arr.push(cell)
                     }
                 }
             }
+            if (arr.length <= 4) {
+                arr = []
+            } else {
+                arr.forEach(element => {
+                    element.remove()
+                })
+                arr = []
+            }
+        }
 
+        let arr1 = []
+        let ballFrame1 = ''
+        for (let j = 0; j < size; j++) {
+            for (let i = 0; i < size; i++) {
+                const cell1 = this.cells2D[i][j]
+                if (cell1 && cell1.ball && cell1.ball.frame === ballFrame1) {
+                    arr1.push(cell1)
+                } else {
+                    if (arr1.length <= 4) {
+                        arr1 = []
+                    } else {
+                        arr1.forEach(element => {
+                            element.remove()
+                        })
+                        arr1 = []
+                    }
+                    if (cell1 && cell1.ball && cell1.ball.frame) {
+
+                        ballFrame1 = cell1.ball.frame
+                        arr1.push(cell1)
+                    }
+                }
+            }
+            if (arr1.length <= 4) {
+                arr1 = []
+            } else {
+                arr1.forEach(element => {
+                    element.remove()
+                })
+                arr1 = []
+            }
         }
 
     }
 
+    _movment() {
+        const { size } = this.config
+
+        const matrix = []
+        for (let i = 0; i < size; i++) {
+            matrix[i] = []
+            for (let j = 0; j < size; j++) {
+                if (this.cells2D[i][j].ball) {
+                    matrix[i][j] = " 1 "
+                } else {
+                    matrix[i][j] = " 0"
+                }
+
+            }
+        }
+        console.warn(matrix);
+
+
+    }
+
     _checkForGameOver() {
-        // if (!this.) {
-        //     console.warn('GAME OVER');
-        // }
+
     }
 }
