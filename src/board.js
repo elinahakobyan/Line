@@ -31,11 +31,11 @@ export class Board extends Container {
                 cell.y = row * cell.height
                 this.cells.push(cell)
                 this.addChild(cell)
+
             }
         }
 
         this.cells2D = chunk(this.cells, size)
-        // console.warn(this.cells2D);
     }
 
     _createBalls(count) {
@@ -51,7 +51,7 @@ export class Board extends Container {
         this._movment()
 
 
-            ;
+
 
     }
 
@@ -61,7 +61,10 @@ export class Board extends Container {
         }
 
         if (cell.ball) {
+
             this._activeCell = cell.activate()
+            this._check()
+
         } else if (cell.isEmpty() && this._activeCell) {
             cell.setBall(this._activeCell.ball)
             this._activeCell.ball = null
@@ -69,8 +72,9 @@ export class Board extends Container {
 
             this._createBalls(this.config.spawn)
         }
-        // console.warn(cell.x)
-        // console.warn(this._activeCell.x);
+        console.warn();
+
+
     }
 
     _checkForMatch(cell) {
@@ -163,6 +167,43 @@ export class Board extends Container {
     }
 
     _checkForGameOver() {
+    }
+
+    _check() {
+        const { size } = this.config
+
+        let x = this._activeCell.y / this._activeCell.height
+        let y = this._activeCell.x / this._activeCell.width
+
+        let arr = [];
+        const cell = this.cells2D
+
+        if (cell[x - 1] && cell[x - 1][y] && !cell[x - 1][y].ball) {
+            arr.push(cell[x - 1][y])
+
+        }
+        if (cell[x + 1] && cell[x + 1][y] && !cell[x + 1][y].ball) {
+            arr.push(cell[x + 1][y])
+
+
+        }
+        if (cell[x][y - 1] && !cell[x][y - 1].ball) {
+            arr.push(cell[x][y - 1])
+
+        }
+        if (cell[x][y + 1] && !cell[x][y + 1].ball) {
+            arr.push(cell[x][y + 1])
+
+        }
+        console.warn(arr);
+
+
+
+
+
+
+
+
 
     }
 }
