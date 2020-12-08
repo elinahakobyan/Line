@@ -1,4 +1,4 @@
-import { Container, Sprite } from 'pixi.js'
+import { Container, CountLimiter, Sprite } from 'pixi.js'
 import sampleSize from 'lodash.samplesize'
 import sample from 'lodash.sample'
 import { BAllS } from './constants';
@@ -27,10 +27,13 @@ export class Board extends Container {
                 const cell = new Cell()
                 cell.interactive = true
                 cell.on('pointerdown', this._onCellClick.bind(this, cell))
-                cell.x = col * cell.width
-                cell.y = row * cell.height
+                cell.x = row * cell.width
+                cell.y = col * cell.height
+                cell.row = row
+                cell.col = col
                 this.cells.push(cell)
                 this.addChild(cell)
+
 
             }
         }
@@ -48,33 +51,33 @@ export class Board extends Container {
 
         this._checkForMatch()
         this._checkForGameOver()
-        this._movment()
-
-
 
 
     }
 
     _onCellClick(cell) {
+        let startI;
+        let startJ;
+        let finishI;
+        let finishJ;
+
+
         if (this._activeCell) {
             this._activeCell.deactivate()
         }
-
         if (cell.ball) {
-
             this._activeCell = cell.activate()
-            this._check()
-
         } else if (cell.isEmpty() && this._activeCell) {
-            cell.setBall(this._activeCell.ball)
+            startI = this._activeCell.row
+            startJ = this._activeCell.col
+            finishI = cell.row
+            finishJ = cell.col
+
+            this._movment(startI, startJ, finishI, finishJ, cell);
             this._activeCell.ball = null
             this._activeCell = null
 
-            this._createBalls(this.config.spawn)
         }
-        console.warn();
-
-
     }
 
     _checkForMatch(cell) {
@@ -146,64 +149,65 @@ export class Board extends Container {
 
     }
 
-    _movment() {
+    _movment(i1, j1, i2, j2, cell) {
+
+
+        var PF = require('pathfinding');
         const { size } = this.config
 
         const matrix = []
         for (let i = 0; i < size; i++) {
             matrix[i] = []
             for (let j = 0; j < size; j++) {
-                if (this.cells2D[i][j].ball) {
-                    matrix[i][j] = " 1 "
+                if (this.cells2D[j][i].ball) {
+                    matrix[i][j] = 1
                 } else {
-                    matrix[i][j] = " 0"
+                    matrix[i][j] = 0
                 }
 
             }
         }
-        console.warn(matrix);
 
+        var grid = new PF.Grid(matrix);
+        grid.setWalkableAt(0, 1, false);
+        var finder = new PF.AStarFinder();
+        var path = finder.findPath(i1, j1, i2, j2, grid);
+
+        if (path.length > 0) {
+            let i = 0
+            const selectedCell = this.cells2D[i1][j1]
+            // console.warn(selectedCell);
+            const ball = selectedCell.ball
+            selectedCell.ball = null
+
+            const interval = setInterval(() => {
+                const cell = this.cells2D[path[i][0]][path[i][1]]
+                cell.addChild(ball)
+                i++
+                if (i >= path.length) {
+                    cell.ball = ball
+                    clearInterval(interval)
+                    this._createBalls(this.config.spawn)
+                }
+            }, 100)
+        } else {
+            this.cells2D[i1][j1].ball
+            console.warn(this.cells2D[i1][j1]);
+        }
 
     }
 
     _checkForGameOver() {
+        let count = 0;
+        for (let i = 0; i < this.cells.length; i++) {
+            if (this.cells[i].ball) {
+                count++
+                if (count === this.cells.length) {
+                    console.warn("Game Over");
+                }
+            }
+        }
     }
 
-    _check() {
-        const { size } = this.config
 
-        let x = this._activeCell.y / this._activeCell.height
-        let y = this._activeCell.x / this._activeCell.width
-
-        let arr = [];
-        const cell = this.cells2D
-
-        if (cell[x - 1] && cell[x - 1][y] && !cell[x - 1][y].ball) {
-            arr.push(cell[x - 1][y])
-
-        }
-        if (cell[x + 1] && cell[x + 1][y] && !cell[x + 1][y].ball) {
-            arr.push(cell[x + 1][y])
-
-
-        }
-        if (cell[x][y - 1] && !cell[x][y - 1].ball) {
-            arr.push(cell[x][y - 1])
-
-        }
-        if (cell[x][y + 1] && !cell[x][y + 1].ball) {
-            arr.push(cell[x][y + 1])
-
-        }
-        console.warn(arr);
-
-
-
-
-
-
-
-
-
-    }
 }

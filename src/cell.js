@@ -6,6 +6,7 @@ export class Cell extends Sprite {
     constructor() {
         super(Texture.from('button'));
         this.anchor.set(0.5)
+
     }
 
     isEmpty() {
@@ -35,3 +36,8 @@ export class Cell extends Sprite {
 
     }
 }
+
+
+
+
+
