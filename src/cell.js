@@ -25,7 +25,6 @@ export class Cell extends Sprite {
 
     deactivate() {
         this.ball.alpha = 1
-
         return this
     }
     remove() {

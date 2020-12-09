@@ -61,23 +61,27 @@ export class Board extends Container {
         let finishI;
         let finishJ;
 
-
-        if (this._activeCell) {
-            this._activeCell.deactivate()
-        }
-        if (cell.ball) {
-            this._activeCell = cell.activate()
-        } else if (cell.isEmpty() && this._activeCell) {
-            startI = this._activeCell.row
-            startJ = this._activeCell.col
-            finishI = cell.row
-            finishJ = cell.col
-
-            this._movment(startI, startJ, finishI, finishJ, cell);
-            this._activeCell.ball = null
+        if (cell !== this._activeCell) {
+            if (this._activeCell) {
+                this._activeCell.deactivate()
+            }
+            if (cell.ball) {
+                this._activeCell = cell.activate()
+            } else if (cell.isEmpty() && this._activeCell) {
+                startI = this._activeCell.row
+                startJ = this._activeCell.col
+                finishI = cell.row
+                finishJ = cell.col
+                this._activeCell.deactivate()
+                this._activeCell = null
+                this._movment(startI, startJ, finishI, finishJ, cell);
+            }
+        } else {
+            this._ahctiveCell.deactivate()
             this._activeCell = null
 
         }
+
     }
 
     _checkForMatch(cell) {
@@ -150,8 +154,6 @@ export class Board extends Container {
     }
 
     _movment(i1, j1, i2, j2, cell) {
-
-
         var PF = require('pathfinding');
         const { size } = this.config
 
@@ -169,14 +171,12 @@ export class Board extends Container {
         }
 
         var grid = new PF.Grid(matrix);
-        grid.setWalkableAt(0, 1, false);
         var finder = new PF.AStarFinder();
         var path = finder.findPath(i1, j1, i2, j2, grid);
 
         if (path.length > 0) {
             let i = 0
             const selectedCell = this.cells2D[i1][j1]
-            // console.warn(selectedCell);
             const ball = selectedCell.ball
             selectedCell.ball = null
 
@@ -190,10 +190,11 @@ export class Board extends Container {
                     this._createBalls(this.config.spawn)
                 }
             }, 100)
-        } else {
-            this.cells2D[i1][j1].ball
-            console.warn(this.cells2D[i1][j1]);
+
         }
+        if (path.length === 0) {
+        }
+
 
     }
 
