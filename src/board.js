@@ -1,10 +1,45 @@
-import { Container, CountLimiter, Sprite } from 'pixi.js'
+import { Container, CountLimiter, Sprite, Text, TextStyle, Texture } from 'pixi.js'
 import sampleSize from 'lodash.samplesize'
 import sample from 'lodash.sample'
 import { BAllS } from './constants';
 import { Cell } from './cell.js'
 import { Ball } from './ball';
 import chunk from 'lodash.chunk'
+import { Bar } from './bar.js'
+import { Message, Style } from './text.js'
+import { getEmiter } from './game';
+
+class ScoreBoxComponent extends Container {
+    constructor() {
+        super()
+
+        this._build()
+    }
+
+    updateScore(value) {
+        this.text.text = "Score : " + value
+    }
+
+    _build() {
+        this.addChild((this._bg = this._buildBg()))
+        this.addChild((this.text = this._buildText()))
+    }
+
+    _buildBg() {
+        const bg = new Sprite(Texture.from('button1'))
+        bg.anchor.set(0.5)
+        return bg
+    }
+
+    _buildText() {
+        const style = new Style()
+        style.fontSize = 36;
+        style.fill = ' 0xff1010';
+        const text = new Message("Score : " + 0, style)
+
+        return text
+    }
+}
 
 
 export class Board extends Container {
@@ -15,9 +50,14 @@ export class Board extends Container {
         this.config = config
         this.cells = []
         this.balls = []
+        this.score = 0;
 
         this._createCells()
+        this._createScoreBox()
         this._createBalls(this.config.entry)
+
+
+        this._scorBox.updateScore(this.score)
     }
 
     _createCells() {
@@ -40,6 +80,13 @@ export class Board extends Container {
 
         this.cells2D = chunk(this.cells, size)
     }
+
+    _createScoreBox() {
+        this._scorBox = new ScoreBoxComponent()
+        this._scorBox.y = this.height
+        this.addChild(this._scorBox)
+    }
+
 
     _createBalls(count) {
         const emptyCells = sampleSize(this.cells.filter((cell) => !cell.ball), count)
@@ -77,7 +124,7 @@ export class Board extends Container {
                 this._movment(startI, startJ, finishI, finishJ, cell);
             }
         } else {
-            this._ahctiveCell.deactivate()
+            this._activeCell.deactivate()
             this._activeCell = null
 
         }
@@ -99,7 +146,10 @@ export class Board extends Container {
                     } else {
                         arr.forEach(element => {
                             element.remove()
+                            this.score += 1
+
                         })
+
                         arr = []
                     }
                     if (cell && cell.ball && cell.ball.frame) {
@@ -113,6 +163,9 @@ export class Board extends Container {
             } else {
                 arr.forEach(element => {
                     element.remove()
+                    this.score += 1
+
+
                 })
                 arr = []
             }
@@ -131,7 +184,11 @@ export class Board extends Container {
                     } else {
                         arr1.forEach(element => {
                             element.remove()
+                            this.score += 1
+
                         })
+
+
                         arr1 = []
                     }
                     if (cell1 && cell1.ball && cell1.ball.frame) {
@@ -146,11 +203,16 @@ export class Board extends Container {
             } else {
                 arr1.forEach(element => {
                     element.remove()
+                    this.score += 1
+
+
                 })
+
                 arr1 = []
             }
         }
 
+        this._scorBox.updateScore(this.score)
     }
 
     _movment(i1, j1, i2, j2, cell) {
@@ -169,7 +231,6 @@ export class Board extends Container {
 
             }
         }
-
         var grid = new PF.Grid(matrix);
         var finder = new PF.AStarFinder();
         var path = finder.findPath(i1, j1, i2, j2, grid);
@@ -199,15 +260,47 @@ export class Board extends Container {
     }
 
     _checkForGameOver() {
+        const container = new Container()
         let count = 0;
         for (let i = 0; i < this.cells.length; i++) {
             if (this.cells[i].ball) {
                 count++
                 if (count === this.cells.length) {
-                    console.warn("Game Over");
+                    const bar = new Bar()
+                    const style = new Style()
+                    const text = new Message('Game Over.', style);
+
+                    const style3 = new Style()
+                    style3.fontSize = 36;
+                    style3.fill = ' 0xff1010';
+                    const text3 = new Message("Score : " + this.score, style3)
+                    text3.position.x = 200
+                    text3.position.y = 280
+
+                    const style4 = new Style()
+                    style4.fontSize = 20;
+                    style4.fill = ' 0xff1010';
+                    const text4 = new Message('Play again', style4)
+                    text4.interactive = true
+                    text4.position.x = 220
+                    text4.position.y = 320
+                    text4.on('pointerdown', () => {
+                        const emitter = getEmiter()
+
+                        emitter.emit("game_over")
+                    });
+
+                    container.addChild(bar)
+                    container.addChild(text)
+                    container.addChild(text3)
+                    container.addChild(text4)
+
+
                 }
             }
         }
+        this.addChild(container)
+
     }
 
 

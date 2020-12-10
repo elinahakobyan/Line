@@ -1,6 +1,12 @@
+import EventEmitter from 'eventemitter3'
 import { Application } from 'pixi.js'
 import { Board } from './board.js'
 
+const emitter = new EventEmitter()
+
+export function getEmiter() {
+    return emitter
+}
 
 export class Game extends Application {
     constructor() {
@@ -11,6 +17,9 @@ export class Game extends Application {
 
         document.body.appendChild(this.view)
         this._loadAssets()
+        const emmiter = getEmiter()
+
+        emitter.on("game_over", this.gameOver, this)
     }
 
     _loadAssets() {
@@ -23,6 +32,8 @@ export class Game extends Application {
             .add('ball6', 'assets/red_circle.png')
             .add('ball7', 'assets/yellow_boxTick.png')
             .add('ball8', 'assets/yellow_circle.png')
+            .add('bar', 'assets/bar.png')
+            .add('button1', 'assets/button.png')
         this.loader.load(() => {
             this._onLoadComplete()
         })
@@ -36,5 +47,9 @@ export class Game extends Application {
         })
         this._board.position.set(100, 100)
         this.stage.addChild(this._board)
+    }
+    gameOver() {
+        this._board.destroy()
+        this._onLoadComplete()
     }
 } 
