@@ -1,55 +1,52 @@
-import EventEmitter from 'eventemitter3'
-import { Application } from 'pixi.js'
-import { Board } from './board.js'
+import { Application, Sprite, Texture } from 'pixi.js';
 
-const emitter = new EventEmitter()
-
-export function getEmiter() {
-    return emitter
-}
+import { Screen } from './screen.js';
 
 export class Game extends Application {
-    constructor() {
-        super({
-            width: window.innerWidth,
-            height: window.innerHeight
-        })
+  constructor() {
+    super({
+      width: window.innerWidth,
+      height: window.innerHeight,
+      backgroundColor: 0xffffff,
+    });
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    document.body.appendChild(this.view);
+    this._loadAssets();
+  }
+  _loadAssets() {
+    this.loader
+      .add('burgundyDivan', 'assets/ui/burgundyDivan.png')
+      .add('grayDivan', 'assets/ui/grayDivan.png')
+      .add('orangeDivan', 'assets/ui/orangeDivan.png')
+      .add('torquoiseDivan', 'assets/ui/torquoiseDivan.png')
+      .add('hand', 'assets/ui/hand.png')
+      .add('like', 'assets/ui/icon_like.png')
+      .add('logo', 'assets/ui/logo.png')
+      .add('chair1', 'assets/furniture/chair1.png')
+      .add('chair2', 'assets/furniture/chair2.png')
+      .add('chair3', 'assets/furniture/chair3.png')
+      .add('chair4', 'assets/furniture/chair4.png')
+      .add('table1', 'assets/furniture/table1.png')
+      .add('table2', 'assets/furniture/table2.png')
+      .add('font', 'assets/font/kenvector_future.ttf');
 
-        document.body.appendChild(this.view)
-        this._loadAssets()
-        const emmiter = getEmiter()
+    this.loader.load(() => {
+      this._onLoadComplete();
+    });
+  }
 
-        emitter.on("game_over", this.gameOver, this)
-    }
+  _onLoadComplete() {
+    this.build();
+  }
 
-    _loadAssets() {
-        this.loader.add('button', 'assets/grey_button13.png')
-            .add('ball1', 'assets/blue_circle.png')
-            .add('ball2', 'assets/blue_boxTick.png')
-            .add('ball3', 'assets/green_boxTick.png')
-            .add('ball4', 'assets/green_circle.png')
-            .add('ball5', 'assets/red_boxTick.png')
-            .add('ball6', 'assets/red_circle.png')
-            .add('ball7', 'assets/yellow_boxTick.png')
-            .add('ball8', 'assets/yellow_circle.png')
-            .add('bar', 'assets/bar.png')
-            .add('button1', 'assets/button.png')
-        this.loader.load(() => {
-            this._onLoadComplete()
-        })
-    }
+  build() {
+    this.buildTitle();
+  }
 
-    _onLoadComplete() {
-        this._board = new Board({
-            entry: 5,
-            spawn: 3,
-            size: 8
-        })
-        this._board.position.set(100, 100)
-        this.stage.addChild(this._board)
-    }
-    gameOver() {
-        this._board.destroy()
-        this._onLoadComplete()
-    }
-} 
+  buildTitle() {
+    const title = Sprite.from('logo');
+    title.position.set(this.width / 2, (this.height * 1) / 5);
+    this.stage.addChild(title);
+  }
+}

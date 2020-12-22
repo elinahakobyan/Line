@@ -24,11 +24,6 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "eventemitter3": "^4.0.7",
-    "lodash.chunk": "^4.2.0",
-    "lodash.sample": "^4.2.1",
-    "lodash.samplesize": "^4.2.0",
-    "pathfinding": "^0.4.18",
-    "pixi.js": "^5.3.3"
+    "pixi.js": "^5.3.6"
   }
 }
