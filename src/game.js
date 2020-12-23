@@ -1,6 +1,6 @@
 import { Application, Container, Sprite, Texture, TilingSprite } from 'pixi.js';
+import {Image} from './image.js';
 
-import { Screen } from './screen.js';
 import { Message, Style } from './text.js';
 
 export class Game extends Application {
@@ -67,7 +67,7 @@ export class Game extends Application {
   }
 
   buildBg() {
-    const container = new Container(config);
+    const container = new Image('nkar','Tap on the piece you love! ',this.width,this.height);
     const text = this.buildText();
     const bg = Sprite.from('nkar');
 

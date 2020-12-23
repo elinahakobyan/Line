@@ -1,7 +1,7 @@
 import { Container, Texture } from 'pixi.js';
 import { Message, Style } from './text.js';
 
-export class Container extends Container {
+export class Image extends Container {
   constructor(image, text, pageW, pageH) {
     super();
     this.anchor.set(0.5);
@@ -23,8 +23,7 @@ export class Container extends Container {
     const landscapeX = this.pageW / 5;
     const landscapeY = (this.pageH * 9) / 20;
     this.decidePosition(this, portraitX, portraitY, landscapeX, landscapeY);
-    t;
-    his.scaleChanging(table);
+    this.scaleChanging();
   }
   decidePosition(portraitX, portraitY, landscapeX, landscapeY) {
     if (this.pageOrintation() === 'landscape') {
@@ -33,7 +32,7 @@ export class Container extends Container {
       element.position.set(portraitX, portraitY);
     }
   }
-  scaleChanging(this) {
+  scaleChanging() {
     if (this.pageW < this.width || this.height < this.height) {
       if (this.pageW > this.height) {
         this.scale.set(this.height / this.width);
