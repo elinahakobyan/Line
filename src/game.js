@@ -30,6 +30,8 @@ export class Game extends Application {
       .add('chair4', 'assets/furniture/chair4.png')
       .add('table1', 'assets/furniture/table1.png')
       .add('table2', 'assets/furniture/table2.png')
+      .add('table1k', 'assets/furniture/table1k.png')
+
       .add('font', 'assets/font/kenvector_future.ttf')
       .add('nkar', 'assets/ui/nkar.png');
 
@@ -43,10 +45,10 @@ export class Game extends Application {
   }
 
   build() {
-    this.buildTitle();
+    // this.buildTitle();
     this.buildBg();
-    this.buildTable();
-    this.buildSecondTable();
+    // this.buildTable();
+    // this.buildSecondTable();
   }
 
   pageOrintation() {
@@ -65,7 +67,7 @@ export class Game extends Application {
   }
 
   buildBg() {
-    const container = new Container();
+    const container = new Container(config);
     const text = this.buildText();
     const bg = Sprite.from('nkar');
 
@@ -76,7 +78,7 @@ export class Game extends Application {
     const portraitY = (this.height * 9) / 35;
     const landscapeX = bg.width / 2;
     const landscapeY = 700; //TODO
-    this.decidePosition(container, bg, portraitX, portraitY, landscapeX, landscapeY);
+    this.decidePosition(bg, portraitX, portraitY, landscapeX, landscapeY, container);
     this.scaleChanging(container);
     container.addChild(bg);
     container.addChild(text);
@@ -93,30 +95,32 @@ export class Game extends Application {
   }
 
   buildTable() {
-    const table = Sprite.from('table1');
+    const table = Sprite.from('table1k');
+    table.anchor.set(0.5);
     const portraitX = this.width / 2;
     const portraitY = (this.height * 9) / 20;
     const landscapeX = this.width / 5;
     const landscapeY = (this.height * 9) / 20;
-    this.decidePosition(table, null, portraitX, portraitY, landscapeX, landscapeY);
+    this.decidePosition(table, portraitX, portraitY, landscapeX, landscapeY);
     this.scaleChanging(table);
     this.stage.addChild(table);
   }
+
   buildSecondTable() {
-    const table = Sprite.from('table2');
+    const table = Sprite.from('table1k');
     table.anchor.set(0.5);
     const portraitX = this.width / 2;
     const portraitY = (this.height * 9) / 12;
     const landscapeX = (3 * this.width) / 4;
     const landscapeY = (this.height * 9) / 20;
-    this.decidePosition(table, null, portraitX, portraitY, landscapeX, landscapeY);
+    this.decidePosition(table, portraitX, portraitY, landscapeX, landscapeY);
     this.scaleChanging(table);
     this.stage.addChild(table);
   }
 
-  decidePosition(element, sprite, portraitX, portraitY, landscapeX, landscapeY) {
-    if (sprite === null) {
-      sprite = element;
+  decidePosition(sprite, portraitX, portraitY, landscapeX, landscapeY, element) {
+    if (element === undefined) {
+      element = sprite;
     }
     if (this.pageOrintation() === 'landscape') {
       element.position.set(landscapeX, landscapeY);

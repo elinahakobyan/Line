@@ -1,36 +1,42 @@
-import { Sprite, Texture } from 'pixi.js';
+import { Container, Texture } from 'pixi.js';
+import { Message, Style } from './text.js';
 
-export class Image extends Sprite {
-  constructor(config) {
-    // console.warn(config);
-    super(Texture.from(config.image));
+export class Container extends Container {
+  constructor(image, text, pageW, pageH) {
+    super();
     this.anchor.set(0.5);
-    this.portraitX = config.portraitX;
-    this.portraitY = config.portraitY;
-    this.landscapeX = config.landscapeX;
-    this.landscapeY = config.landscapeY;
-    this.pageOrintation = config.pageOrintation;
-    this.pageH = config.pageH;
-    this.pageW = config.pageW;
+    this.image = Texture.from(image);
+    this.text = new Message(text, this.style);
+    this.pagew = pageW;
+    this.pageH = pageH;
     this.build();
   }
+
   build() {
-    this.decidePosition();
+    this.buildImage();
     this.scaleChanging();
   }
 
-  decidePosition() {
-    if (this.pageOrintation === 'landscape') {
-      this.position.set(this.landscapeX, this.landscapeY);
+  buildImage() {
+    const portraitX = this.pageW / 2;
+    const portraitY = (this.pageH * 9) / 20;
+    const landscapeX = this.pageW / 5;
+    const landscapeY = (this.pageH * 9) / 20;
+    this.decidePosition(this, portraitX, portraitY, landscapeX, landscapeY);
+    t;
+    his.scaleChanging(table);
+  }
+  decidePosition(portraitX, portraitY, landscapeX, landscapeY) {
+    if (this.pageOrintation() === 'landscape') {
+      element.position.set(landscapeX, landscapeY);
     } else {
-      this.position.set(this.portraitX, this.portraitY);
+      element.position.set(portraitX, portraitY);
     }
   }
-
-  scaleChanging() {
-    if (this.pageW < this.width || this.pageH < this.height) {
-      if (this.pageW > this.pageH) {
-        this.scale.set(this.pageH / this.width);
+  scaleChanging(this) {
+    if (this.pageW < this.width || this.height < this.height) {
+      if (this.pageW > this.height) {
+        this.scale.set(this.height / this.width);
       } else {
         this.scale.set(this.pageW / this.width);
       }
