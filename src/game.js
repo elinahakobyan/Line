@@ -1,6 +1,7 @@
-import { Application, Sprite, Texture } from 'pixi.js';
+import { Application, Container, Sprite, Texture, TilingSprite } from 'pixi.js';
 
 import { Screen } from './screen.js';
+import { Message, Style } from './text.js';
 
 export class Game extends Application {
   constructor() {
@@ -29,7 +30,8 @@ export class Game extends Application {
       .add('chair4', 'assets/furniture/chair4.png')
       .add('table1', 'assets/furniture/table1.png')
       .add('table2', 'assets/furniture/table2.png')
-      .add('font', 'assets/font/kenvector_future.ttf');
+      .add('font', 'assets/font/kenvector_future.ttf')
+      .add('nkar', 'assets/ui/nkar.png');
 
     this.loader.load(() => {
       this._onLoadComplete();
@@ -42,11 +44,94 @@ export class Game extends Application {
 
   build() {
     this.buildTitle();
+    this.buildBg();
+    this.buildTable();
+    this.buildSecondTable();
+  }
+
+  pageOrintation() {
+    if (this.width > this.height) {
+      return 'landscape';
+    }
+    return 'portrait';
   }
 
   buildTitle() {
     const title = Sprite.from('logo');
-    title.position.set(this.width / 2, (this.height * 1) / 5);
+    this.scaleChanging(title);
+    title.anchor.set(0.5);
+    title.position.set(this.width / 2, this.height / 10 + 5);
     this.stage.addChild(title);
+  }
+
+  buildBg() {
+    const container = new Container();
+    const text = this.buildText();
+    const bg = Sprite.from('nkar');
+
+    bg.anchor.set(0.5);
+    bg.width = this.width;
+    bg.height = this.height / 13;
+    const portraitX = bg.width / 2;
+    const portraitY = (this.height * 9) / 35;
+    const landscapeX = bg.width / 2;
+    const landscapeY = 700; //TODO
+    this.decidePosition(container, bg, portraitX, portraitY, landscapeX, landscapeY);
+    this.scaleChanging(container);
+    container.addChild(bg);
+    container.addChild(text);
+    this.stage.addChild(container);
+  }
+
+  buildText() {
+    const style = new Style();
+    style.fontSize = 43;
+    style.fill = ' #FFFFFF';
+    const text = new Message('Tap on the piece you love! ', style);
+    this.scaleChanging(text);
+    return text;
+  }
+
+  buildTable() {
+    const table = Sprite.from('table1');
+    const portraitX = this.width / 2;
+    const portraitY = (this.height * 9) / 20;
+    const landscapeX = this.width / 5;
+    const landscapeY = (this.height * 9) / 20;
+    this.decidePosition(table, null, portraitX, portraitY, landscapeX, landscapeY);
+    this.scaleChanging(table);
+    this.stage.addChild(table);
+  }
+  buildSecondTable() {
+    const table = Sprite.from('table2');
+    table.anchor.set(0.5);
+    const portraitX = this.width / 2;
+    const portraitY = (this.height * 9) / 12;
+    const landscapeX = (3 * this.width) / 4;
+    const landscapeY = (this.height * 9) / 20;
+    this.decidePosition(table, null, portraitX, portraitY, landscapeX, landscapeY);
+    this.scaleChanging(table);
+    this.stage.addChild(table);
+  }
+
+  decidePosition(element, sprite, portraitX, portraitY, landscapeX, landscapeY) {
+    if (sprite === null) {
+      sprite = element;
+    }
+    if (this.pageOrintation() === 'landscape') {
+      element.position.set(landscapeX, landscapeY);
+    } else {
+      element.position.set(portraitX, portraitY);
+    }
+  }
+
+  scaleChanging(element) {
+    if (this.width < element.width || this.height < element.height) {
+      if (this.width > this.height) {
+        element.scale.set(this.height / element.width);
+      } else {
+        element.scale.set(this.width / element.width);
+      }
+    }
   }
 }
